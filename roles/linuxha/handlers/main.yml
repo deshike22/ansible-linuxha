@@ -1,0 +1,14 @@
+---
+# handlers file for linuxha
+- name: restart pacemaker
+#  command: service pacemaker restart
+  service: name=pacemakerd state=restarted
+#     enabled: yes
+  become: yes
+
+- name: restart corosync
+#  command: service corosync restart
+
+  service: name=corosync state=restarted
+#     enabled: yes
+  become: yes

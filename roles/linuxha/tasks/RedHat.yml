@@ -1,0 +1,37 @@
+---
+# Tasks specific to RedHat systems
+
+- name: "Gathering OS information"
+  set_fact: 
+    os_dist: "{{ ansible_distribution }}"
+    os_major_release: "{{ ansible_distribution_major_version }}"
+  tags:
+    - linuxha
+
+- name: "RedHat | Install Pacemaker"
+  yum: 
+    name: pacemaker
+    state: latest
+    disablerepo: "*"
+    enablerepo: base
+  tags:
+    - linuxha
+
+- name: "RedHat  Get Cluster Resource Manager Repo"
+  yum_repository:
+    name: network_ha-clustering_Stable
+    description: Stable High Availability/Clustering packages ({{ os_dist }}_{{ os_dist }}-{{ os_major_release }})
+    baseurl: http://download.opensuse.org/repositories/network:/ha-clustering:/Stable/{{ os_dist }}_{{ os_dist }}-{{ os_major_release }}/
+    gpgkey: http://download.opensuse.org/repositories/network:/ha-clustering:/Stable/{{ os_dist }}_{{ os_dist }}-{{ os_major_release }}//repodata/repomd.xml.key
+    gpgcheck: yes
+    enabled: yes
+  tags:
+    - linuxha
+
+- name: "RedHat | Install Cluster Resource Manager"
+  yum:
+    name: crmsh
+    state: latest
+  tags:
+    - linuxha
+

@@ -1,0 +1,4 @@
+---
+# defaults file for linuxha
+cluster_multicast_address: 226.94.1.1
+cluster_multicast_port: 4000

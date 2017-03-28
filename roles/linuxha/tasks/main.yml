@@ -1,0 +1,38 @@
+---
+# tasks file for linuxha
+#- name: "Include OS-specific variables"
+#  include_vars: "{{ ansible_os_family }}.yml"
+
+
+- name: "Install Pacemaker Cluster Resource Manager"
+  include: "RedHat.yml"
+  when: ansible_os_family == "RedHat"
+  tags:
+   - linuxha
+
+- name: "Configuring Corosync Config"
+  template:
+       src: corosync.conf.j2
+       dest: /etc/corosync/corosync.conf
+       owner: root
+       group: root
+       mode: 0644
+#  notify: 
+#   - restart corosync
+#    - restart pacemaker
+  tags:
+   - linuxha
+
+- name: "Restarting Corosync"
+  service: name=corosync state=restarted
+
+- name: "Restarting Pacemaker"
+  service: name=pacemaker state=restarted
+
+- name: "Configuring Cluster Resources"
+  shell: |
+     crm configure property stonith-enabled=false
+     crm configure property no-quorum-policy=ignore
+     crm configure primitive ClusterIP ocf:heartbeat:IPaddr params ip={{ cluster_vip }} cidr_netmask=32 op monitor interval=30s
+#     crm configure primitive failover-zabbix_proxy lsb:zabbix-proxy op monitor interval=5s
+#     crm configure group zabbix_proxy-cluster ClusterIP failover-zabbix_proxy
